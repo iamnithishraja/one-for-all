@@ -13,6 +13,7 @@ dist/
 .idea/
 *.sublime-project
 *.sublime-workspace
+package-lock.json
 
 # OS specific
 .DS_Store
