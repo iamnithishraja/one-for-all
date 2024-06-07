@@ -1,6 +1,5 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import tracksRouter from "./routes/notesRoute";
-import prismaClient from "./config/db";
 
 const app = express();
 

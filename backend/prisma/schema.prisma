@@ -14,9 +14,9 @@ datasource db {
 }
 
 model College {
-  id      String    @id @default(cuid())
+  id      String   @id @default(cuid())
   name    String
-  Account Account[]
+  users   User[]
   courses Course[]
   Track   Track[]
 }
@@ -32,13 +32,15 @@ model Course {
 
 model Account {
   id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id])
   linewaysEmail    String?
   linewaysPassword String?
-  collegeId        String
-  college          College  @relation(fields: [collegeId], references: [id])
   courseId         String
   course           Course   @relation(fields: [courseId], references: [id])
   semister         Semister
+
+  @@index([userId])
 }
 
 enum Semister {
@@ -59,9 +61,12 @@ model User {
   password    String?
   image       String?
   role        Role         @default(user)
+  collegeId   String
+  college     College      @relation(fields: [collegeId], references: [id])
   submissions Submission[]
   quizScores  QuizScore[]
   Track       Track[]
+  Account     Account?
 }
 
 enum Role {
@@ -173,7 +178,7 @@ model Track {
   title       String
   description String
   image       String
-  categories  TrackCategory[] // This replaces 'category Categories[]'
+  Subject     String
   problems    TrackProblems[]
   collegeId   String
   college     College         @relation(fields: [collegeId], references: [id])
@@ -181,19 +186,4 @@ model Track {
   createdBy   User            @relation(fields: [autherId], references: [id])
   hidden      Boolean         @default(false)
   createdAt   DateTime        @default(now())
-}
-
-model TrackCategory {
-  trackId    String
-  track      Track      @relation(fields: [trackId], references: [id])
-  categoryId String
-  category   Categories @relation(fields: [categoryId], references: [id])
-
-  @@id([trackId, categoryId]) // Composite primary key
-}
-
-model Categories {
-  id       String          @id @default(uuid())
-  category String
-  tracks   TrackCategory[]
 }

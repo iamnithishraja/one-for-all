@@ -28,9 +28,9 @@ CREATE TABLE "Course" (
 -- CreateTable
 CREATE TABLE "Account" (
     "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "linewaysEmail" TEXT,
     "linewaysPassword" TEXT,
-    "collegeId" TEXT NOT NULL,
     "courseId" TEXT NOT NULL,
     "semister" "Semister" NOT NULL,
 
@@ -45,6 +45,7 @@ CREATE TABLE "User" (
     "password" TEXT,
     "image" TEXT,
     "role" "Role" NOT NULL DEFAULT 'user',
+    "collegeId" TEXT NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -146,6 +147,7 @@ CREATE TABLE "Track" (
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "image" TEXT NOT NULL,
+    "Subject" TEXT NOT NULL,
     "collegeId" TEXT NOT NULL,
     "autherId" TEXT NOT NULL,
     "hidden" BOOLEAN NOT NULL DEFAULT false,
@@ -155,26 +157,16 @@ CREATE TABLE "Track" (
 );
 
 -- CreateTable
-CREATE TABLE "TrackCategory" (
-    "trackId" TEXT NOT NULL,
-    "categoryId" TEXT NOT NULL,
-
-    CONSTRAINT "TrackCategory_pkey" PRIMARY KEY ("trackId","categoryId")
-);
-
--- CreateTable
-CREATE TABLE "Categories" (
-    "id" TEXT NOT NULL,
-    "category" TEXT NOT NULL,
-
-    CONSTRAINT "Categories_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "_CodeLanguageToProblemStatement" (
     "A" INTEGER NOT NULL,
     "B" TEXT NOT NULL
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Account_userId_key" ON "Account"("userId");
+
+-- CreateIndex
+CREATE INDEX "Account_userId_idx" ON "Account"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
@@ -192,10 +184,13 @@ CREATE INDEX "_CodeLanguageToProblemStatement_B_index" ON "_CodeLanguageToProble
 ALTER TABLE "Course" ADD CONSTRAINT "Course_collegeId_fkey" FOREIGN KEY ("collegeId") REFERENCES "College"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Account" ADD CONSTRAINT "Account_collegeId_fkey" FOREIGN KEY ("collegeId") REFERENCES "College"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_courseId_fkey" FOREIGN KEY ("courseId") REFERENCES "Course"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "User" ADD CONSTRAINT "User_collegeId_fkey" FOREIGN KEY ("collegeId") REFERENCES "College"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Submission" ADD CONSTRAINT "Submission_codeLanguageId_fkey" FOREIGN KEY ("codeLanguageId") REFERENCES "CodeLanguage"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -235,12 +230,6 @@ ALTER TABLE "Track" ADD CONSTRAINT "Track_collegeId_fkey" FOREIGN KEY ("collegeI
 
 -- AddForeignKey
 ALTER TABLE "Track" ADD CONSTRAINT "Track_autherId_fkey" FOREIGN KEY ("autherId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "TrackCategory" ADD CONSTRAINT "TrackCategory_trackId_fkey" FOREIGN KEY ("trackId") REFERENCES "Track"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "TrackCategory" ADD CONSTRAINT "TrackCategory_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Categories"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_CodeLanguageToProblemStatement" ADD CONSTRAINT "_CodeLanguageToProblemStatement_A_fkey" FOREIGN KEY ("A") REFERENCES "CodeLanguage"("id") ON DELETE CASCADE ON UPDATE CASCADE;
