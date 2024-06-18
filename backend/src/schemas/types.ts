@@ -1,8 +1,9 @@
 import z from "zod";
 import { Request } from "express";
-import { trackSchema } from "./trackSchemas";
+import { createProblemsSchema, trackSchema } from "./trackSchemas";
 
 export type InputTypeCreateTrack = z.infer<typeof trackSchema>;
+export type InputTypeCreateProblem = z.infer<typeof createProblemsSchema>;
 
 interface user {
   id: string;

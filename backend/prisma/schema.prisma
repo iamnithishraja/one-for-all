@@ -99,8 +99,8 @@ model Submission {
 model CodeLanguage {
   id                Int                @id // judge0 language id
   value             String // monaco language string
-  label             String
-  problemStatements ProblemStatement[] //implicit m-n relationship
+  label             String 
+  problemStatements ProblemStatement[]
   submissions       Submission[]
 }
 
@@ -116,24 +116,26 @@ model TestCase {
 model ProblemStatement {
   id                 String         @id @default(uuid())
   testCases          TestCase[]
-  problem            Problem        @relation(fields: [problemId], references: [id])
-  problemId          String         @unique
-  languagesSupported CodeLanguage[] //implicit m-n relationship
+  problem            Problem?
+  languagesSupported CodeLanguage[]
   submissions        Submission[]
   mainFuncName       String // the function name which will return the output
   argumentNames      String[]
 }
 
 model Problem {
-  id               String            @id @default(uuid())
-  title            String
-  description      String
-  notionDocId      String
-  mcqQuestions     MCQQuestion[]
-  type             ProblemType
-  trackProblems    TrackProblems[]
-  problemStatement ProblemStatement?
-  quizScores       QuizScore[]
+  id                 String            @id @default(uuid())
+  title              String
+  description        String
+  notionDocId        String
+  problemType        ProblemType
+  problemStatementId String?           @unique
+  problemStatement   ProblemStatement? @relation(fields: [problemStatementId], references: [id])
+  MCQQuestionId      String?           @unique
+  MCQQuestion        MCQQuestion?      @relation(fields: [MCQQuestionId], references: [id])
+  quizScoreId        String?           @unique
+  QuizScore          QuizScore?        @relation(fields: [quizScoreId], references: [id])
+  TrackProblems      TrackProblems[]
 }
 
 model MCQQuestion {
@@ -141,7 +143,7 @@ model MCQQuestion {
   question      String
   options       String[]
   correctOption String
-  problem       Problem  @relation(fields: [problemId], references: [id])
+  problem       Problem?
   problemId     String
 }
 
@@ -156,7 +158,7 @@ model QuizScore {
   score     Int
   user      User?    @relation(fields: [userId], references: [id])
   userId    String?
-  problem   Problem  @relation(fields: [problemId], references: [id])
+  problem   Problem?
   problemId String
   createdAt DateTime @default(now())
 }
